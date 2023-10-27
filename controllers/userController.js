@@ -88,5 +88,24 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 // route    PUT "/api/user/profile"
 // access   Private
 export const updateUserProfile = asyncHandler(async (req, res) => {
-  res.json("Update profile is ready");
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      message: "User updated successfuly",
+      data: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+      },
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
